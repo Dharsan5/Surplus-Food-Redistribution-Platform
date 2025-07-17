@@ -1,35 +1,55 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Toaster } from "@/components/ui/toaster";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
-function App() {
-  const [count, setCount] = useState(0)
+// Import all your original pages
+import WelcomeScreen from "@/pages/WelcomeScreen";
+import LoginScreen from "@/pages/LoginScreen";
+import SignUpScreen from "@/pages/SignUpScreen";
+import ForgotPasswordScreen from "@/pages/ForgotPasswordScreen";
+import HomeScreen from "@/pages/HomeScreen";
+import FoodDetailScreen from "@/pages/FoodDetailScreen";
+import AddFoodScreen from "@/pages/AddFoodScreen";
+import ListingsScreen from "@/pages/ListingsScreen";
+import RequestsScreen from "@/pages/RequestsScreen";
+import ProfileScreen from "@/pages/ProfileScreen";
+import NotificationsScreen from "@/pages/NotificationsScreen";
+import SettingsScreen from "@/pages/SettingsScreen";
+import HelpScreen from "@/pages/HelpScreen";
+import NotFound from "@/pages/NotFound";
 
+const queryClient = new QueryClient();
+
+const App = () => {
+  console.log("App component is rendering with full pages!");
+  
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<WelcomeScreen />} />
+            <Route path="/login" element={<LoginScreen />} />
+            <Route path="/signup" element={<SignUpScreen />} />
+            <Route path="/forgot-password" element={<ForgotPasswordScreen />} />
+            <Route path="/home" element={<HomeScreen />} />
+            <Route path="/food/:id" element={<FoodDetailScreen />} />
+            <Route path="/add-food" element={<AddFoodScreen />} />
+            <Route path="/listings" element={<ListingsScreen />} />
+            <Route path="/requests" element={<RequestsScreen />} />
+            <Route path="/profile" element={<ProfileScreen />} />
+            <Route path="/notifications" element={<NotificationsScreen />} />
+            <Route path="/settings" element={<SettingsScreen />} />
+            <Route path="/help" element={<HelpScreen />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+          <Toaster />
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
-export default App
+export default App;
+
