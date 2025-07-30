@@ -1,19 +1,14 @@
-import { ArrowLeft, Calendar, MapPin, Clock, Heart, Share2, Phone } from "lucide-react";
-import { useState } from "react";
+import { ArrowLeft, Calendar, MapPin, Clock, Heart, Share2, Phone, Trash2, Edit } from "lucide-react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
-const FoodDetailScreen = () => {
-  const navigate = useNavigate();
-  const { id } = useParams();
-  const [isLiked, setIsLiked] = useState(false);
-  const [isRequesting, setIsRequesting] = useState(false);
-
-  // Mock data - in real app, this would fetch based on ID
-  const foodDetails = {
-    id: id || "1",
+// Mock data - in real app, this would fetch from API
+const mockFoodData = {
+  "1": {
+    id: "1",
     name: "Fresh Vegetables",
-    image: "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?w=600&h=400&fit=crop",
+    image: "https://wallpapers.com/images/hd/vegetables-pictures-qs8trfk65nvldcyr.jpg",
     availability: "Today, 2 PM - 5 PM",
     donor: "City Bakery",
     location: "123 Main Street, Downtown",
@@ -22,15 +17,137 @@ const FoodDetailScreen = () => {
     contactPerson: "Manager - City Bakery",
     phone: "+91 98765 43210",
     distance: "2.5 km away"
-  };
+  },
+  "2": {
+    id: "2",
+    name: "Bread & Pastries",
+    image: "https://c4.wallpaperflare.com/wallpaper/294/670/477/baked-goods-pastry-bakery-breakfast-wallpaper-preview.jpg",
+    availability: "Tomorrow, 10 AM",
+    donor: "Corner Cafe",
+    location: "123 Main Street",
+    description: "Freshly baked bread and pastries including croissants, baguettes, and muffins. Perfect for breakfast or snacks.",
+    quantity: "Approximately 15 kg",
+    contactPerson: "Manager - Corner Cafe",
+    phone: "+91 98765 25689",
+    distance: "1.5 km away"
+  },
+  "3": {
+    id: "3",
+    name: "Fresh Vegetables",
+    image: "https://sherohomefood.in/wp-content/uploads/2024/06/Blog_1.jpg",
+    availability: "Today, 2 PM - 5 PM",
+    donor: "Restaurant Plaza",
+    location: "Food Court",
+    description: "Fresh mixed vegetables including carrots, spinach, tomatoes, and bell peppers. Perfect for community kitchens and NGOs.",
+    quantity: "Approximately 20 kg",
+    contactPerson: "Manager - Restaurant Plaza",
+    phone: "+91 98765 45628",
+    distance: "3.5 km away"
+  }
+};
+
+const FoodDetailScreen = () => {
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const [isLiked, setIsLiked] = useState(false);
+  const [isRequesting, setIsRequesting] = useState(false);
+  const [foodDetails, setFoodDetails] = useState(null);
+  const [isUserAddedItem, setIsUserAddedItem] = useState(false);
+
+  useEffect(() => {
+    // First check user-added items
+    const userItems = JSON.parse(localStorage.getItem('userFoodItems') || '[]');
+    console.log('User items from localStorage:', userItems);
+    console.log('Looking for ID:', id);
+    
+    const userItem = userItems.find(item => item.id === id);
+    console.log('Found user item:', userItem);
+    
+    if (userItem) {
+      setFoodDetails(userItem);
+      setIsUserAddedItem(true);
+    } else {
+      // Fall back to mock data
+      const mockItem = mockFoodData[id];
+      console.log('Using mock data:', mockItem);
+      setFoodDetails(mockItem || null);
+      setIsUserAddedItem(false);
+    }
+  }, [id]);
 
   const handleRequest = async () => {
     setIsRequesting(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    setIsRequesting(false);
-    // Show success message or navigate
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      alert('Pickup request submitted successfully! The donor will be notified.');
+      // In a real app, you might navigate to a confirmation screen or back to listings
+      navigate('/home');
+    } catch (error) {
+      alert('Failed to submit pickup request. Please try again.');
+    } finally {
+      setIsRequesting(false);
+    }
   };
+
+  const handleCallDonor = () => {
+    // Open phone dialer with the donor's phone number
+    window.open(`tel:${foodDetails.phone}`, '_self');
+  };
+
+  const handleDirections = () => {
+    // Open Google Maps with the pickup location
+    const encodedLocation = encodeURIComponent(foodDetails.location);
+    const mapsUrl = `https://www.google.com/maps/search/${encodedLocation}`;
+    window.open(mapsUrl, '_blank');
+  };
+
+  const handleDeleteItem = () => {
+    if (!isUserAddedItem) return;
+    
+    const confirmDelete = window.confirm(
+      'Are you sure you want to delete this food item? This action cannot be undone.'
+    );
+    
+    if (confirmDelete) {
+      // Remove from localStorage
+      const userItems = JSON.parse(localStorage.getItem('userFoodItems') || '[]');
+      const updatedItems = userItems.filter(item => item.id !== id);
+      localStorage.setItem('userFoodItems', JSON.stringify(updatedItems));
+      
+      // Trigger custom event to notify other components
+      window.dispatchEvent(new CustomEvent('foodItemDeleted', { detail: { id } }));
+      
+      console.log('Food item deleted:', id);
+      
+      // Navigate back to home
+      navigate('/home');
+    }
+  };
+
+  const handleEditItem = () => {
+    if (!isUserAddedItem) return;
+    
+    // Navigate to edit screen with the item ID
+    navigate(`/edit-food/${id}`);
+  };
+
+  // Handle case when food item is not found or still loading
+  if (!foodDetails) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center p-6">
+          <div className="w-16 h-16 border-4 border-accent border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Loading...</h2>
+          <p className="text-gray-600 mb-4">Please wait while we load the food details.</p>
+          <Button onClick={() => navigate('/home')} className="bg-accent text-white mt-4">
+            Go Back to Home
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -134,11 +251,17 @@ const FoodDetailScreen = () => {
           {/* Action Buttons */}
           <div className="space-y-4 pt-4">
             <div className="flex gap-3">
-              <button className="flex-1 h-14 bg-gray-100 hover-gray-200 text-gray-700 font-semibold rounded-2xl flex items-center justify-center gap-2 transition-all duration-200 touch-area">
+              <button 
+                onClick={handleCallDonor}
+                className="flex-1 h-14 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-2xl flex items-center justify-center gap-2 transition-all duration-200 touch-area"
+              >
                 <Phone className="w-5 h-5" />
                 Call Donor
               </button>
-              <button className="flex-1 h-14 bg-blue-50 hover-blue-100 text-blue-600 font-semibold rounded-2xl flex items-center justify-center gap-2 transition-all duration-200 touch-area">
+              <button 
+                onClick={handleDirections}
+                className="flex-1 h-14 bg-blue-50 hover:bg-blue-100 text-blue-600 font-semibold rounded-2xl flex items-center justify-center gap-2 transition-all duration-200 touch-area"
+              >
                 <MapPin className="w-5 h-5" />
                 Directions
               </button>
@@ -147,7 +270,7 @@ const FoodDetailScreen = () => {
             <Button 
               onClick={handleRequest}
               disabled={isRequesting}
-              className="w-full h-16 text-lg font-bold bg-accent hover-accent/90 text-white rounded-2xl transition-all duration-300 transform hover-[1.02] active-[0.98] shadow-lg hover-xl disabled-70 disabled-not-allowed"
+              className="w-full h-16 text-lg font-bold bg-accent hover:bg-accent/90 text-white rounded-2xl transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed"
             >
               {isRequesting ? (
                 <div className="flex items-center gap-3">
@@ -158,6 +281,29 @@ const FoodDetailScreen = () => {
                 "Request Pickup"
               )}
             </Button>
+
+            {/* Edit and Delete Buttons - Only show for user-added items */}
+            {isUserAddedItem && (
+              <div className="flex gap-3">
+                <Button 
+                  onClick={handleEditItem}
+                  variant="outline"
+                  className="flex-1 h-16 text-lg font-bold border-2 border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white rounded-2xl transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl"
+                >
+                  <Edit className="w-5 h-5 mr-2" />
+                  Edit Item
+                </Button>
+                
+                <Button 
+                  onClick={handleDeleteItem}
+                  variant="outline"
+                  className="flex-1 h-16 text-lg font-bold border-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white rounded-2xl transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl"
+                >
+                  <Trash2 className="w-5 h-5 mr-2" />
+                  Delete Item
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </div>

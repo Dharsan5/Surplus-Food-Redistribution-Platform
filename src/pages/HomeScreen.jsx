@@ -1,5 +1,5 @@
 import { Plus, Search, Bell, Filter } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import FoodCard from "@/components/FoodCard";
@@ -9,12 +9,77 @@ const HomeScreen = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [showNotification, setShowNotification] = useState(true);
+  const [userFoodItems, setUserFoodItems] = useState([]);
 
-  const foodListings = [
+  // Get dynamic greeting based on time
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    
+    if (hour >= 5 && hour < 12) {
+      return "Good Morning! ☀️";
+    } else if (hour >= 12 && hour < 17) {
+      return "Good Afternoon! 🌤️";
+    } else if (hour >= 17 && hour < 21) {
+      return "Good Evening! 🌅";
+    } else {
+      return "Good Night! 🌙";
+    }
+  };
+
+  // Load user-added food items from localStorage
+  useEffect(() => {
+    const loadUserFoodItems = () => {
+      const savedItems = JSON.parse(localStorage.getItem('userFoodItems') || '[]');
+      console.log('Loading user food items:', savedItems);
+      setUserFoodItems(savedItems);
+    };
+
+    loadUserFoodItems();
+    
+    // Listen for storage changes to update when new items are added
+    const handleStorageChange = () => {
+      loadUserFoodItems();
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Also check when the window gains focus (for same-tab updates)
+    window.addEventListener('focus', loadUserFoodItems);
+    
+    // Listen for custom event when items are added
+    const handleItemAdded = () => {
+      loadUserFoodItems();
+    };
+    
+    // Listen for custom event when items are deleted
+    const handleItemDeleted = () => {
+      loadUserFoodItems();
+    };
+    
+    // Listen for custom event when items are updated
+    const handleItemUpdated = () => {
+      loadUserFoodItems();
+    };
+    
+    window.addEventListener('foodItemAdded', handleItemAdded);
+    window.addEventListener('foodItemDeleted', handleItemDeleted);
+    window.addEventListener('foodItemUpdated', handleItemUpdated);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('focus', loadUserFoodItems);
+      window.removeEventListener('foodItemAdded', handleItemAdded);
+      window.removeEventListener('foodItemDeleted', handleItemDeleted);
+      window.removeEventListener('foodItemUpdated', handleItemUpdated);
+    };
+  }, []);
+
+  // Static food listings
+  const staticFoodListings = [
     {
       id: "1",
       name: "Fresh Vegetables",
-      image: "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?w=400&h=300&fit=crop",
+      image: "https://wallpapers.com/images/hd/vegetables-pictures-qs8trfk65nvldcyr.jpg",
       availabilityDate: "Today, 2 PM",
       donor: "City Bakery",
       location: "Downtown"
@@ -22,7 +87,7 @@ const HomeScreen = () => {
     {
       id: "2", 
       name: "Bread & Pastries",
-      image: "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=400&h=300&fit=crop",
+      image: "https://c4.wallpaperflare.com/wallpaper/294/670/477/baked-goods-pastry-bakery-breakfast-wallpaper-preview.jpg",
       availabilityDate: "Tomorrow, 10 AM",
       donor: "Corner Cafe",
       location: "Main Street"
@@ -30,14 +95,34 @@ const HomeScreen = () => {
     {
       id: "3",
       name: "Cooked Meals",
-      image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=400&h=300&fit=crop",
+      image: "https://sherohomefood.in/wp-content/uploads/2024/06/Blog_1.jpg",      
       availabilityDate: "Today, 6 PM",
       donor: "Restaurant Plaza",
       location: "Food Court"
     }
   ];
 
-  const filteredListings = foodListings.filter(food =>
+  // Combine static and user-added food listings
+  const allFoodListings = [
+    ...userFoodItems.map(item => ({
+      ...item,
+      availabilityDate: new Date(item.availability).toLocaleDateString('en-US', {
+        weekday: 'short',
+        month: 'short', 
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+      }),
+      isUserAdded: true
+    })),
+    ...staticFoodListings.map(item => ({
+      ...item,
+      isUserAdded: false
+    }))
+  ];
+
+  const filteredListings = allFoodListings.filter(food =>
     food.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     food.donor.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -48,7 +133,7 @@ const HomeScreen = () => {
       <div className="bg-white px-6 pt-12 pb-6">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-1">Hello! 👋</h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-1">{getGreeting()}</h1>
             <p className="text-gray-600">Let's help reduce food waste today</p>
           </div>
           
@@ -75,9 +160,6 @@ const HomeScreen = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full h-14 bg-gray-100 rounded-2xl pl-12 pr-16 text-gray-900 placeholder-gray-500 border-0 focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all duration-200"
           />
-          <button className="absolute right-3 top-1/2 transform -translate-y-1/2 w-8 h-8 bg-primary rounded-xl flex items-center justify-center">
-            <Filter className="w-4 h-4 text-white" />
-          </button>
         </div>
         
         {/* CTA Button */}

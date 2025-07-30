@@ -1,12 +1,13 @@
-import { useState } from "react";
-import { ArrowLeft, Camera, MapPin, Clock, Plus, X } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { ArrowLeft, Camera, MapPin, Clock, Save, X } from "lucide-react";
+import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 
-const AddFoodScreen = () => {
+const EditFoodScreen = () => {
   const navigate = useNavigate();
+  const { id } = useParams();
   const { toast } = useToast();
   const [selectedImages, setSelectedImages] = useState([]);
   const [formData, setFormData] = useState({
@@ -19,6 +20,44 @@ const AddFoodScreen = () => {
     contactPerson: "",
     phone: ""
   });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Load the existing food item data
+    const userItems = JSON.parse(localStorage.getItem('userFoodItems') || '[]');
+    const existingItem = userItems.find(item => item.id === id);
+    
+    if (existingItem) {
+      setFormData({
+        name: existingItem.name || "",
+        description: existingItem.description || "",
+        quantity: existingItem.quantity || "",
+        pickupTime: existingItem.availability || "",
+        location: existingItem.location || "",
+        donor: existingItem.donor || "",
+        contactPerson: existingItem.contactPerson || "",
+        phone: existingItem.phone || ""
+      });
+      
+      // Set existing image if available
+      if (existingItem.image && existingItem.image !== "https://via.placeholder.com/400x300?text=No+Image") {
+        setSelectedImages([{
+          id: 'existing',
+          preview: existingItem.image,
+          isExisting: true
+        }]);
+      }
+      
+      setLoading(false);
+    } else {
+      toast({
+        title: "Item Not Found",
+        description: "The food item you're trying to edit could not be found.",
+        variant: "destructive"
+      });
+      navigate('/home');
+    }
+  }, [id, navigate, toast]);
 
   const handleImageUpload = (event) => {
     const files = Array.from(event.target.files);
@@ -56,38 +95,53 @@ const AddFoodScreen = () => {
       return;
     }
 
-    // Create new food item
-    const newFoodItem = {
-      id: Date.now().toString(),
-      name: formData.name,
-      description: formData.description,
-      quantity: formData.quantity,
-      availability: formData.pickupTime,
-      location: formData.location,
-      contactPerson: formData.contactPerson,
-      phone: formData.phone,
-      donor: formData.donor, 
-      distance: "0.5 km away", // Default distance
-      image: selectedImages.length > 0 ? selectedImages[0].preview : "https://via.placeholder.com/400x300?text=No+Image"
-    };
+    // Update the existing food item
+    const userItems = JSON.parse(localStorage.getItem('userFoodItems') || '[]');
+    const updatedItems = userItems.map(item => {
+      if (item.id === id) {
+        return {
+          ...item,
+          name: formData.name,
+          description: formData.description,
+          quantity: formData.quantity,
+          availability: formData.pickupTime,
+          location: formData.location,
+          contactPerson: formData.contactPerson,
+          phone: formData.phone,
+          donor: formData.donor,
+          image: selectedImages.length > 0 ? selectedImages[0].preview : "https://via.placeholder.com/400x300?text=No+Image"
+        };
+      }
+      return item;
+    });
 
-    // Store in localStorage (in a real app, this would be sent to a server)
-    const existingItems = JSON.parse(localStorage.getItem('userFoodItems') || '[]');
-    existingItems.push(newFoodItem);
-    localStorage.setItem('userFoodItems', JSON.stringify(existingItems));
+    // Save updated items to localStorage
+    localStorage.setItem('userFoodItems', JSON.stringify(updatedItems));
 
     // Trigger custom event to notify other components
-    window.dispatchEvent(new CustomEvent('foodItemAdded', { detail: newFoodItem }));
+    window.dispatchEvent(new CustomEvent('foodItemUpdated', { detail: { id } }));
 
-    console.log('New food item added:', newFoodItem);
-    console.log('All items in storage:', existingItems);
+    console.log('Food item updated:', id);
 
     toast({
-      title: "Food Listed Successfully!",
-      description: "Your food donation has been added to the listings.",
+      title: "Food Item Updated!",
+      description: "Your food donation has been successfully updated.",
     });
-    navigate("/home");
+    
+    navigate(`/food/${id}`);
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center p-6">
+          <div className="w-16 h-16 border-4 border-accent border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Loading...</h2>
+          <p className="text-gray-600">Please wait while we load the food details.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -102,7 +156,7 @@ const AddFoodScreen = () => {
           >
             <ArrowLeft className="w-5 h-5" />
           </Button>
-          <h1 className="text-2xl font-bold text-gray-900">Add Food Donation</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Edit Food Donation</h1>
         </div>
       </div>
 
@@ -110,7 +164,7 @@ const AddFoodScreen = () => {
         {/* Photo Upload */}
         <div className="bg-white rounded-2xl p-6">
           <label className="block text-sm font-medium text-gray-700 mb-3">
-            Add Photos
+            Edit Photos
           </label>
           
           {/* Photo Upload Area */}
@@ -129,7 +183,7 @@ const AddFoodScreen = () => {
               className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer hover:border-gray-400 transition-colors block"
             >
               <Camera className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-              <p className="text-gray-500">Tap to add photos</p>
+              <p className="text-gray-500">Tap to add or change photos</p>
               <p className="text-sm text-gray-400 mt-1">You can select multiple images</p>
             </label>
 
@@ -179,7 +233,7 @@ const AddFoodScreen = () => {
               value={formData.description}
               onChange={(e) => setFormData({...formData, description: e.target.value})}
               placeholder="Describe the food condition, expiry, etc."
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus-2 focus-green-500 focus-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
               rows={3}
               required
             />
@@ -267,17 +321,26 @@ const AddFoodScreen = () => {
           </div>
         </div>
 
-        <Button
-          type="submit"
-          className="w-full h-14 text-lg font-bold bg-green-500 hover:bg-green-600 text-white rounded-2xl"
-        >
-          <Plus className="w-5 h-5 mr-2" />
-          List Food Donation
-        </Button>
+        <div className="flex gap-3 pb-6">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => navigate(-1)}
+            className="flex-1 h-14 text-lg font-bold border-2 border-gray-300 text-gray-600 hover:bg-gray-100 rounded-2xl"
+          >
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            className="flex-1 h-14 text-lg font-bold bg-blue-500 hover:bg-blue-600 text-white rounded-2xl"
+          >
+            <Save className="w-5 h-5 mr-2" />
+            Save Changes
+          </Button>
+        </div>
       </form>
     </div>
   );
 };
 
-export default AddFoodScreen;
-
+export default EditFoodScreen;

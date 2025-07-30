@@ -11,6 +11,7 @@ import ForgotPasswordScreen from "@/pages/ForgotPasswordScreen";
 import HomeScreen from "@/pages/HomeScreen";
 import FoodDetailScreen from "@/pages/FoodDetailScreen";
 import AddFoodScreen from "@/pages/AddFoodScreen";
+import EditFoodScreen from "@/pages/EditFoodScreen";
 import ListingsScreen from "@/pages/ListingsScreen";
 import RequestsScreen from "@/pages/RequestsScreen";
 import ProfileScreen from "@/pages/ProfileScreen";
@@ -36,6 +37,7 @@ const App = () => {
             <Route path="/home" element={<HomeScreen />} />
             <Route path="/food/:id" element={<FoodDetailScreen />} />
             <Route path="/add-food" element={<AddFoodScreen />} />
+            <Route path="/edit-food/:id" element={<EditFoodScreen />} />
             <Route path="/listings" element={<ListingsScreen />} />
             <Route path="/requests" element={<RequestsScreen />} />
             <Route path="/profile" element={<ProfileScreen />} />

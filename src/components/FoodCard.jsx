@@ -1,8 +1,8 @@
-import { Calendar, MapPin, Clock } from "lucide-react";
+import { Calendar, MapPin, Clock, User } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const FoodCard = ({ id, name, image, availabilityDate, donor, location }) => {
+const FoodCard = ({ id, name, image, availabilityDate, donor, location, isUserAdded = false }) => {
   const navigate = useNavigate();
   const [imageLoaded, setImageLoaded] = useState(false);
 
@@ -26,7 +26,13 @@ const FoodCard = ({ id, name, image, availabilityDate, donor, location }) => {
         <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         
         {/* Status Badge */}
-        <div className="absolute top-3 right-3">
+        <div className="absolute top-3 right-3 flex gap-2">
+          {isUserAdded && (
+            <div className="bg-blue-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1">
+              <User className="w-3 h-3" />
+              My Item
+            </div>
+          )}
           <div className="bg-green-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1">
             <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
             Available
