@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, Camera, MapPin, Clock, Save, X } from "lucide-react";
+import { ArrowLeft, Camera, MapPin, Clock, Save, X, Plus } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,8 @@ const EditFoodScreen = () => {
   const { id } = useParams();
   const { toast } = useToast();
   const [selectedImages, setSelectedImages] = useState([]);
+  const [photoInputMode, setPhotoInputMode] = useState('upload'); // 'upload' or 'url'
+  const [imageUrl, setImageUrl] = useState('');
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -81,6 +83,19 @@ const EditFoodScreen = () => {
     setSelectedImages(prev => prev.filter(img => img.id !== imageId));
   };
 
+  const handleImageUrlAdd = () => {
+    if (imageUrl.trim()) {
+      const newImage = {
+        id: Date.now() + Math.random(),
+        isUrl: true,
+        preview: imageUrl.trim(),
+        url: imageUrl.trim()
+      };
+      setSelectedImages(prev => [...prev, newImage]);
+      setImageUrl(''); // Clear the input
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     
@@ -109,7 +124,8 @@ const EditFoodScreen = () => {
           contactPerson: formData.contactPerson,
           phone: formData.phone,
           donor: formData.donor,
-          image: selectedImages.length > 0 ? selectedImages[0].preview : "https://via.placeholder.com/400x300?text=No+Image"
+          images: selectedImages.map(img => img.isUrl ? img.url : img.preview),
+          image: selectedImages.length > 0 ? (selectedImages[0].isUrl ? selectedImages[0].url : selectedImages[0].preview) : "https://via.placeholder.com/400x300?text=No+Image"
         };
       }
       return item;
@@ -169,23 +185,69 @@ const EditFoodScreen = () => {
           
           {/* Photo Upload Area */}
           <div className="space-y-4">
-            <input
-              type="file"
-              multiple
-              accept="image/*"
-              onChange={handleImageUpload}
-              className="hidden"
-              id="photo-upload"
-            />
-            
-            <label
-              htmlFor="photo-upload"
-              className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer hover:border-gray-400 transition-colors block"
-            >
-              <Camera className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-              <p className="text-gray-500">Tap to add or change photos</p>
-              <p className="text-sm text-gray-400 mt-1">You can select multiple images</p>
-            </label>
+            {/* Toggle between upload and URL */}
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant={photoInputMode === 'upload' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setPhotoInputMode('upload')}
+                className="flex-1"
+              >
+                Upload Image
+              </Button>
+              <Button
+                type="button"
+                variant={photoInputMode === 'url' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setPhotoInputMode('url')}
+                className="flex-1"
+              >
+                Image URL
+              </Button>
+            </div>
+
+            {photoInputMode === 'upload' ? (
+              <>
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                  id="photo-upload"
+                />
+                
+                <label
+                  htmlFor="photo-upload"
+                  className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer hover:border-gray-400 transition-colors block"
+                >
+                  <Camera className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                  <p className="text-gray-500">Tap to upload photos</p>
+                  <p className="text-sm text-gray-400 mt-1">You can select multiple images</p>
+                </label>
+              </>
+            ) : (
+              <div className="space-y-3">
+                <div className="flex gap-2">
+                  <Input
+                    value={imageUrl}
+                    onChange={(e) => setImageUrl(e.target.value)}
+                    placeholder="Enter image URL (e.g., https://example.com/image.jpg)"
+                    className="flex-1"
+                  />
+                  <Button
+                    type="button"
+                    onClick={handleImageUrlAdd}
+                    disabled={!imageUrl.trim()}
+                    size="sm"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                </div>
+                <p className="text-sm text-gray-500">Paste an image URL to add it to your food listing</p>
+              </div>
+            )}
 
             {/* Selected Images Preview */}
             {selectedImages.length > 0 && (
@@ -196,6 +258,9 @@ const EditFoodScreen = () => {
                       src={image.preview}
                       alt="Selected"
                       className="w-full h-24 object-cover rounded-lg"
+                      onError={(e) => {
+                        e.target.src = "https://via.placeholder.com/100x100?text=Failed+to+Load";
+                      }}
                     />
                     <button
                       type="button"
@@ -204,6 +269,16 @@ const EditFoodScreen = () => {
                     >
                       <X className="w-4 h-4" />
                     </button>
+                    {image.isUrl && (
+                      <div className="absolute bottom-1 left-1 bg-blue-500 text-white text-xs px-1 rounded">
+                        URL
+                      </div>
+                    )}
+                    {image.isExisting && (
+                      <div className="absolute bottom-1 left-1 bg-green-500 text-white text-xs px-1 rounded">
+                        Current
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

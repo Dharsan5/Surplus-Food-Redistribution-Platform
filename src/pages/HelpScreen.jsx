@@ -12,7 +12,7 @@ const HelpScreen = () => {
     },
     {
       question: "How can I request food pickup?",
-      answer: "Browse available listings and tap 'Request Pickup' on any item you're interested in."
+      answer: "Browse available food items on the home page and tap 'Request Pickup' on any item you're interested in. You can track your orders in the Orders tab."
     },
     {
       question: "What safety measures should I follow?",

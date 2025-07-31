@@ -1,11 +1,11 @@
-import { ArrowLeft, Bell, Check, Clock, Heart, MessageCircle } from "lucide-react";
+import { ArrowLeft, Bell, Check, Clock, Heart, MessageCircle, CheckCheck } from "lucide-react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
 const NotificationsScreen = () => {
   const navigate = useNavigate();
-
-  const notifications = [
+  const [notifications, setNotifications] = useState([
     {
       id: "1",
       type: "request",
@@ -42,7 +42,48 @@ const NotificationsScreen = () => {
       time: "1 day ago",
       isRead: true
     }
-  ];
+  ]);
+
+  // Mark all notifications as read when component mounts
+  useEffect(() => {
+    // Mark all as read
+    setNotifications(prev => prev.map(notification => ({
+      ...notification,
+      isRead: true
+    })));
+    
+    // Update localStorage to indicate no unread notifications
+    localStorage.setItem('hasUnreadNotifications', 'false');
+    
+    // Trigger event to update other components
+    window.dispatchEvent(new CustomEvent('notificationsRead'));
+  }, []);
+
+  const markAllAsRead = () => {
+    setNotifications(prev => prev.map(notification => ({
+      ...notification,
+      isRead: true
+    })));
+    localStorage.setItem('hasUnreadNotifications', 'false');
+    window.dispatchEvent(new CustomEvent('notificationsRead'));
+  };
+
+  const simulateNewNotification = () => {
+    // For testing purposes - simulate a new notification
+    const newNotification = {
+      id: Date.now().toString(),
+      type: "request",
+      icon: MessageCircle,
+      title: "New pickup request",
+      message: "Someone wants to pickup your latest food item",
+      time: "Just now",
+      isRead: false
+    };
+    
+    setNotifications(prev => [newNotification, ...prev]);
+    localStorage.setItem('hasUnreadNotifications', 'true');
+    window.dispatchEvent(new CustomEvent('newNotification'));
+  };
 
   const getIconColor = (type) => {
     switch (type) {
@@ -62,14 +103,33 @@ const NotificationsScreen = () => {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => navigate("/home")}
+            onClick={() => navigate(-1)}
             className="rounded-full"
           >
             <ArrowLeft className="w-5 h-5" />
           </Button>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-1">
             <Bell className="w-6 h-6 text-gray-900" />
             <h1 className="text-2xl font-bold text-gray-900">Notifications</h1>
+          </div>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={markAllAsRead}
+              className="text-xs"
+            >
+              <CheckCheck className="w-4 h-4 mr-1" />
+              Mark All Read
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={simulateNewNotification}
+              className="text-xs bg-blue-50 text-blue-600 border-blue-200"
+            >
+              + Test
+            </Button>
           </div>
         </div>
       </div>

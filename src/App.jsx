@@ -12,7 +12,7 @@ import HomeScreen from "@/pages/HomeScreen";
 import FoodDetailScreen from "@/pages/FoodDetailScreen";
 import AddFoodScreen from "@/pages/AddFoodScreen";
 import EditFoodScreen from "@/pages/EditFoodScreen";
-import ListingsScreen from "@/pages/ListingsScreen";
+import OrdersScreen from "@/pages/OrdersScreen";
 import RequestsScreen from "@/pages/RequestsScreen";
 import ProfileScreen from "@/pages/ProfileScreen";
 import NotificationsScreen from "@/pages/NotificationsScreen";
@@ -38,7 +38,7 @@ const App = () => {
             <Route path="/food/:id" element={<FoodDetailScreen />} />
             <Route path="/add-food" element={<AddFoodScreen />} />
             <Route path="/edit-food/:id" element={<EditFoodScreen />} />
-            <Route path="/listings" element={<ListingsScreen />} />
+            <Route path="/orders" element={<OrdersScreen />} />
             <Route path="/requests" element={<RequestsScreen />} />
             <Route path="/profile" element={<ProfileScreen />} />
             <Route path="/notifications" element={<NotificationsScreen />} />

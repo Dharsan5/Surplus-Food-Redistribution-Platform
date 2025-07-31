@@ -33,13 +33,13 @@ const mockFoodData = {
   },
   "3": {
     id: "3",
-    name: "Fresh Vegetables",
+    name: "Cooked Meals",
     image: "https://sherohomefood.in/wp-content/uploads/2024/06/Blog_1.jpg",
-    availability: "Today, 2 PM - 5 PM",
+    availability: "Today, 6 PM",
     donor: "Restaurant Plaza",
     location: "Food Court",
-    description: "Fresh mixed vegetables including carrots, spinach, tomatoes, and bell peppers. Perfect for community kitchens and NGOs.",
-    quantity: "Approximately 20 kg",
+    description: "Freshly cooked meals including rice, dal, vegetables, and chapati. Perfect for immediate distribution to those in need.",
+    quantity: "Approximately 30 portions",
     contactPerson: "Manager - Restaurant Plaza",
     phone: "+91 98765 45628",
     distance: "3.5 km away"
