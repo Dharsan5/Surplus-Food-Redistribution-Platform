@@ -2,6 +2,7 @@ import { ArrowRight, Users, Heart, Sparkles } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import './WelcomeScreen.css';
 
 const WelcomeScreen = () => {
   const navigate = useNavigate();

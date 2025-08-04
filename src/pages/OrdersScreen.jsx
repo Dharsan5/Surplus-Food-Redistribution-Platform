@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import BottomNavigation from "@/components/BottomNavigation";
+import './OrdersScreen.css';
 
 const OrdersScreen = () => {
   const [searchQuery, setSearchQuery] = useState("");

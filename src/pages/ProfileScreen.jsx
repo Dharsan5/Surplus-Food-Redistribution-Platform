@@ -2,6 +2,7 @@ import { User, Settings, Bell, HelpCircle, LogOut, Edit } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import BottomNavigation from "@/components/BottomNavigation";
+import './ProfileScreen.css';
 
 const ProfileScreen = () => {
   const navigate = useNavigate();

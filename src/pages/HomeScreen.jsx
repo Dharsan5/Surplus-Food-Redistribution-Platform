@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import FoodCard from "@/components/FoodCard";
 import BottomNavigation from "@/components/BottomNavigation";
+import './HomeScreen.css';
 
 const HomeScreen = () => {
   const navigate = useNavigate();
