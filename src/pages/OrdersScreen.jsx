@@ -107,47 +107,111 @@ const OrdersScreen = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
+    <div className="orders-container">
       {/* Header */}
-      <div className="bg-white px-4 pt-10 pb-4 shadow-sm">
-        <h1 className="text-xl font-bold text-gray-900 mb-3">My Orders</h1>
+      <div className="orders-header">
+        <h1 className="orders-title">My Orders</h1>
         
         {/* Search Bar */}
-        <div className="relative mb-3">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-          <Input
+        <div className="search-container">
+          <Search className="search-icon" />
+          <input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search orders..."
-            className="pl-10 h-9 rounded-lg border-gray-200"
+            className="search-input"
           />
         </div>
       </div>
 
       {/* Orders List */}
-      <div className="px-4 pt-4 space-y-3">
+      <div className="orders-content">
         {filteredOrders.length === 0 ? (
-          <div className="text-center text-gray-500 py-8">
-            <Package className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-            <h3 className="text-lg font-medium mb-2">No Orders Found</h3>
-            <p className="text-sm">You haven't placed any orders yet.</p>
-            <Button
+          <div className="no-orders">
+            <Package className="no-orders-icon" />
+            <h3 className="no-orders-title">No Orders Found</h3>
+            <p className="no-orders-subtitle">You haven't placed any orders yet.</p>
+            <button
               onClick={() => navigate('/home')}
-              className="mt-3 bg-orange-500 hover:bg-orange-600 h-9 px-4"
+              className="browse-button"
             >
               Browse Food Items
-            </Button>
+            </button>
           </div>
         ) : (
           filteredOrders.map((order) => (
-            <div key={order.id} className="bg-white rounded-lg p-3 shadow-sm border border-gray-100">
+            <div key={order.id} className="order-card">
               {/* Order Header */}
-              <div className="flex items-start justify-between mb-2">
-                <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900 text-base">{order.foodItemName}</h3>
-                  <p className="text-sm text-gray-600">from {order.donor}</p>
+              <div className="order-header">
+                <div className="order-info">
+                  <h3 className="order-title">{order.foodItemName}</h3>
+                  <p className="order-donor">from {order.donor}</p>
                 </div>
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
+                <span className={`order-status status-${order.status}`}>
+                  {getStatusText(order.status)}
+                </span>
+              </div>
+
+              {/* Food Image */}
+              <div className="order-body">
+                <img
+                  src={order.image}
+                  alt={order.foodItemName}
+                  className="order-image"
+                  onError={(e) => {
+                    e.target.src = "https://via.placeholder.com/64x64?text=No+Image";
+                  }}
+                />
+                <div className="order-details">
+                  <div className="detail-item">
+                    <Package className="detail-icon" />
+                    <span>{order.quantity}</span>
+                  </div>
+                  <div className="detail-item">
+                    <Clock className="detail-icon" />
+                    <span>{order.pickupTime}</span>
+                  </div>
+                  <div className="detail-item">
+                    <MapPin className="detail-icon" />
+                    <span>{order.pickupLocation}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Contact Info */}
+              <div className="order-footer">
+                <div className="contact-info">
+                  <User className="contact-icon" />
+                  <span>{order.contactPerson}</span>
+                </div>
+                <button
+                  onClick={() => handleCallDonor(order.phone)}
+                  className="call-button"
+                >
+                  <Phone className="call-icon" />
+                  Call
+                </button>
+              </div>
+
+              {/* Order Date */}
+              <div className="order-date">
+                Ordered on {new Date(order.orderDate).toLocaleDateString('en-US', {
+                  weekday: 'short',
+                  year: 'numeric',
+                  month: 'short',
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      <BottomNavigation />
+    </div>
+  );
                   {getStatusText(order.status)}
                 </span>
               </div>

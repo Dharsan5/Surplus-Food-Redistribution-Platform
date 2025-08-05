@@ -107,51 +107,45 @@ const AddFoodScreen = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="add-food-container">
       {/* Header */}
-      <div className="bg-white px-4 pt-10 pb-4 shadow-sm">
-        <div className="flex items-center gap-3 mb-3">
-          <Button
-            variant="ghost"
-            size="icon"
+      <div className="add-food-header">
+        <div className="header-content">
+          <button
             onClick={() => navigate(-1)}
-            className="rounded-full h-8 w-8"
+            className="back-button"
           >
-            <ArrowLeft className="w-4 h-4" />
-          </Button>
-          <h1 className="text-xl font-bold text-gray-900">Add Food Donation</h1>
+            <ArrowLeft className="back-icon" />
+          </button>
+          <h1 className="page-title">Add Food Donation</h1>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="px-4 pt-4 space-y-4">
+      <form onSubmit={handleSubmit} className="add-food-form">
         {/* Photo Upload */}
-        <div className="bg-white rounded-lg p-4">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+        <div className="form-section">
+          <label className="section-label">
             Add Photos
           </label>
           
           {/* Photo Upload Area */}
-          <div className="space-y-3">
+          <div className="photo-upload-area">
             {/* Toggle between upload and URL */}
-            <div className="flex gap-2">
-              <Button
+            <div className="upload-toggle">
+              <button
                 type="button"
-                variant={photoInputMode === 'upload' ? 'default' : 'outline'}
-                size="sm"
                 onClick={() => setPhotoInputMode('upload')}
-                className="flex-1 h-8 text-xs"
+                className={`toggle-button ${photoInputMode === 'upload' ? 'active' : ''}`}
               >
                 Upload Image
-              </Button>
-              <Button
+              </button>
+              <button
                 type="button"
-                variant={photoInputMode === 'url' ? 'default' : 'outline'}
-                size="sm"
                 onClick={() => setPhotoInputMode('url')}
-                className="flex-1 h-8 text-xs"
+                className={`toggle-button ${photoInputMode === 'url' ? 'active' : ''}`}
               >
                 Image URL
-              </Button>
+              </button>
             </div>
 
             {photoInputMode === 'upload' ? (
@@ -161,51 +155,50 @@ const AddFoodScreen = () => {
                   multiple
                   accept="image/*"
                   onChange={handleImageUpload}
-                  className="hidden"
+                  className="file-input"
                   id="photo-upload"
                 />
                 
                 <label
                   htmlFor="photo-upload"
-                  className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-gray-400 transition-colors block"
+                  className="upload-area"
                 >
-                  <Camera className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                  <p className="text-gray-500 text-sm">Tap to upload photos</p>
-                  <p className="text-xs text-gray-400 mt-1">You can select multiple images</p>
+                  <Camera className="upload-icon" />
+                  <p className="upload-text">Tap to upload photos</p>
+                  <p className="upload-subtext">You can select multiple images</p>
                 </label>
               </>
             ) : (
-              <div className="space-y-2">
-                <div className="flex gap-2">
-                  <Input
+              <div className="url-input-area">
+                <div className="url-input-row">
+                  <input
                     value={imageUrl}
                     onChange={(e) => setImageUrl(e.target.value)}
                     placeholder="Enter image URL (e.g., https://example.com/image.jpg)"
-                    className="flex-1 h-9"
+                    className="url-input"
                   />
-                  <Button
+                  <button
                     type="button"
                     onClick={handleImageUrlAdd}
                     disabled={!imageUrl.trim()}
-                    size="sm"
-                    className="h-9"
+                    className="add-url-button"
                   >
                     <Plus className="w-4 h-4" />
-                  </Button>
+                  </button>
                 </div>
-                <p className="text-xs text-gray-500">Paste an image URL to add it to your food listing</p>
+                <p className="url-help-text">Paste an image URL to add it to your food listing</p>
               </div>
             )}
 
             {/* Selected Images Preview */}
             {selectedImages.length > 0 && (
-              <div className="grid grid-cols-4 gap-2">
+              <div className="image-preview-grid">
                 {selectedImages.map((image) => (
-                  <div key={image.id} className="relative">
+                  <div key={image.id} className="image-preview">
                     <img
                       src={image.preview}
                       alt="Selected"
-                      className="w-full h-16 object-cover rounded-md"
+                      className="preview-image"
                       onError={(e) => {
                         e.target.src = "https://via.placeholder.com/64x64?text=Failed+to+Load";
                       }}
@@ -213,14 +206,12 @@ const AddFoodScreen = () => {
                     <button
                       type="button"
                       onClick={() => removeImage(image.id)}
-                      className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs"
+                      className="remove-image-button"
                     >
                       <X className="w-3 h-3" />
                     </button>
                     {image.isUrl && (
-                      <div className="absolute bottom-0.5 left-0.5 bg-blue-500 text-white text-xs px-1 rounded"
-                        style={{ fontSize: '10px' }}
-                      >
+                      <div className="url-badge">
                         URL
                       </div>
                     )}
@@ -232,129 +223,120 @@ const AddFoodScreen = () => {
         </div>
 
         {/* Food Details */}
-        <div className="bg-white rounded-lg p-4 space-y-3">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Food Name
-            </label>
-            <Input
-              value={formData.name}
-              onChange={(e) => setFormData({...formData, name: e.target.value})}
-              placeholder="e.g., Fresh Vegetables, Cooked Rice"
-              className="h-9"
-              required
-            />
-          </div>
+        <div className="form-section">
+          <div className="form-group">
+            <div className="form-field">
+              <label className="field-label">Food Name</label>
+              <input
+                value={formData.name}
+                onChange={(e) => setFormData({...formData, name: e.target.value})}
+                placeholder="e.g., Fresh Vegetables, Cooked Rice"
+                className="form-input"
+                required
+              />
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Description
-            </label>
-            <textarea
-              value={formData.description}
-              onChange={(e) => setFormData({...formData, description: e.target.value})}
-              placeholder="Describe the food condition, expiry, etc."
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              rows={3}
-              required
-            />
-          </div>
+            <div className="form-field">
+              <label className="field-label">Description</label>
+              <textarea
+                value={formData.description}
+                onChange={(e) => setFormData({...formData, description: e.target.value})}
+                placeholder="Describe the food condition, expiry, etc."
+                className="form-textarea"
+                rows={3}
+                required
+              />
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Quantity
-            </label>
-            <Input
-              value={formData.quantity}
-              onChange={(e) => setFormData({...formData, quantity: e.target.value})}
-              placeholder="e.g., 5kg, Serves 10 people"
-              className="h-9"
-              required
-            />
+            <div className="form-field">
+              <label className="field-label">Quantity</label>
+              <input
+                value={formData.quantity}
+                onChange={(e) => setFormData({...formData, quantity: e.target.value})}
+                placeholder="e.g., 5kg, Serves 10 people"
+                className="form-input"
+                required
+              />
+            </div>
           </div>
         </div>
 
         {/* Pickup Details */}
-        <div className="bg-white rounded-lg p-4 space-y-3">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              <Clock className="w-4 h-4 inline mr-1" />
-              Pickup Time
-            </label>
-            <Input
-              type="datetime-local"
-              value={formData.pickupTime}
-              onChange={(e) => setFormData({...formData, pickupTime: e.target.value})}
-              className="h-9"
-              required
-            />
-          </div>
+        <div className="form-section">
+          <div className="form-group">
+            <div className="form-field">
+              <label className="field-label label-with-icon">
+                <Clock className="label-icon" />
+                Pickup Time
+              </label>
+              <input
+                type="datetime-local"
+                value={formData.pickupTime}
+                onChange={(e) => setFormData({...formData, pickupTime: e.target.value})}
+                className="form-input"
+                required
+              />
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              <MapPin className="w-4 h-4 inline mr-1" />
-              Pickup Location
-            </label>
-            <Input
-              value={formData.location}
-              onChange={(e) => setFormData({...formData, location: e.target.value})}
-              placeholder="Enter pickup address"
-              className="h-9"
-              required
-            />
+            <div className="form-field">
+              <label className="field-label label-with-icon">
+                <MapPin className="label-icon" />
+                Pickup Location
+              </label>
+              <input
+                value={formData.location}
+                onChange={(e) => setFormData({...formData, location: e.target.value})}
+                placeholder="Enter pickup address"
+                className="form-input"
+                required
+              />
+            </div>
           </div>
         </div>
 
         {/* Contact Details */}
-        <div className="bg-white rounded-lg p-4 space-y-3">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Contact Person
-            </label>
-            <Input
-              value={formData.contactPerson}
-              onChange={(e) => setFormData({...formData, contactPerson: e.target.value})}
-              placeholder="Your name"
-              className="h-9"
-              required
-            />
-          </div>
+        <div className="form-section">
+          <div className="form-group">
+            <div className="form-field">
+              <label className="field-label">Contact Person</label>
+              <input
+                value={formData.contactPerson}
+                onChange={(e) => setFormData({...formData, contactPerson: e.target.value})}
+                placeholder="Your name"
+                className="form-input"
+                required
+              />
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Donor
-            </label>
-            <Input
-              value={formData.donor}
-              onChange={(e) => setFormData({...formData, donor: e.target.value})}
-              placeholder="Your organization"
-              className="h-9"
-              required
-            />
-          </div>
+            <div className="form-field">
+              <label className="field-label">Donor</label>
+              <input
+                value={formData.donor}
+                onChange={(e) => setFormData({...formData, donor: e.target.value})}
+                placeholder="Your organization"
+                className="form-input"
+                required
+              />
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Phone Number
-            </label>
-            <Input
-              type="tel"
-              value={formData.phone}
-              onChange={(e) => setFormData({...formData, phone: e.target.value})}
-              placeholder="+91 98765 43210"
-              className="h-9"
-              required
-            />
+            <div className="form-field">
+              <label className="field-label">Phone Number</label>
+              <input
+                type="tel"
+                value={formData.phone}
+                onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                placeholder="+91 98765 43210"
+                className="form-input"
+                required
+              />
+            </div>
           </div>
         </div>
 
-        <Button
-          type="submit"
-          className="w-full h-10 text-base font-semibold bg-green-500 hover:bg-green-600 text-white rounded-lg"
-        >
-          <Plus className="w-4 h-4 mr-2" />
+        <button type="submit" className="submit-button">
+          <Plus className="submit-icon" />
           List Food Donation
-        </Button>
+        </button>
       </form>
     </div>
   );

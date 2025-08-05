@@ -158,119 +158,106 @@ const HomeScreen = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-16">
+    <div className="home-container">
       {/* Header */}
-      <div className="bg-white px-4 pt-6 pb-4 shadow-sm">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h1 className="text-xl font-bold text-gray-900 mb-1">{getGreeting()}</h1>
-            <p className="text-sm text-gray-600">Let's help reduce food waste today</p>
+      <div className="home-header">
+        <div className="header-top">
+          <div className="welcome-section">
+            <h1 className="welcome-title">{getGreeting()}</h1>
+            <p className="welcome-subtitle">Let's help reduce food waste today</p>
           </div>
           
-          <div className="relative">
+          <div style={{ position: 'relative' }}>
             <button 
               onClick={handleNotificationClick}
-              className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center transition-all duration-200 hover:bg-gray-200 active:scale-95"
+              className="notification-button"
             >
-              <Bell className="w-4 h-4 text-gray-600" />
+              <Bell className="notification-icon" />
               {showNotification && (
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                <div style={{ position: 'absolute', top: '-0.25rem', right: '-0.25rem', width: '0.75rem', height: '0.75rem', backgroundColor: '#ef4444', borderRadius: '50%', animation: 'pulse 2s infinite' }}></div>
               )}
             </button>
           </div>
         </div>
         
         {/* Search Bar */}
-        <div className="relative mb-4">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+        <div className="search-container">
+          <Search className="search-icon" />
           <input
             type="text"
             placeholder="Search food or donors..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full h-10 bg-gray-100 rounded-lg pl-10 pr-4 text-sm text-gray-900 placeholder-gray-500 border-0 focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all duration-200"
+            className="search-input"
           />
         </div>
         
-        {/* CTA Button */}
-        <Button 
-          onClick={() => navigate("/add-food")}
-          className="w-full h-10 text-sm font-medium bg-gradient-to-r from-accent to-accent/80 hover:bg-accent/90 text-white rounded-lg touch-area transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-md hover:shadow-lg"
-        >
-          <Plus className="mr-2 w-4 h-4" />
-          List Surplus Food
-        </Button>
+        {/* Action Buttons */}
+        <div className="action-buttons">
+          <button 
+            onClick={() => navigate("/add-food")}
+            className="add-food-button"
+          >
+            <Plus className="add-icon" />
+            Add Food Donation
+          </button>
+          
+          <button className="filter-button">
+            <Filter className="filter-icon" />
+          </button>
+        </div>
       </div>
 
       {/* Food Listings Section */}
-      <div className="px-4 py-4">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold text-gray-900">Available Food</h2>
-          <div className="bg-primary/10 text-primary text-sm font-medium px-3 py-1 rounded-full">
-            {filteredListings.length} items
-          </div>
-        </div>
-        
+      <div className="main-content">
         {filteredListings.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Search className="w-8 h-8 text-gray-400" />
-            </div>
-            <p className="text-gray-500 text-lg">No food items found</p>
-            <p className="text-gray-400">Try adjusting your search</p>
+          <div className="no-food-message">
+            <div className="no-food-icon">🍽️</div>
+            <h3 className="no-food-title">No Food Available</h3>
+            <p className="no-food-subtitle">Be the first to add a food donation!</p>
           </div>
         ) : (
-          <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-6">
+          <div className="food-grid">
             {filteredListings.map((food) => (
-              <div
-                key={food.id}
-                onClick={() => navigate(`/food/${food.id}`)}
-                className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer transform hover:scale-[1.02] active:scale-[0.98]"
-              >
-                {/* Food Image */}
-                <div className="relative aspect-square overflow-hidden">
-                  <img
-                    src={food.image || "https://via.placeholder.com/150x150?text=No+Image"}
-                    alt={food.name}
-                    className="w-full h-full object-cover transition-transform duration-200 hover:scale-105"
-                    onError={(e) => {
-                      e.target.src = "https://via.placeholder.com/150x150?text=No+Image";
-                    }}
-                  />
-                  
-                  {/* Status Badges */}
-                  <div className="absolute top-1 left-1">
-                    {food.isUserAdded && (
-                      <span className="bg-blue-500 text-white text-xs px-1 py-0.5 rounded font-medium">
-                        Mine
-                      </span>
-                    )}
+              <div key={food.id} className="food-card" onClick={() => navigate(`/food/${food.id}`)}>
+                <img
+                  src={food.image || "https://via.placeholder.com/400x300?text=No+Image"}
+                  alt={food.name}
+                  className="food-image"
+                  onError={(e) => {
+                    e.target.src = "https://via.placeholder.com/400x300?text=No+Image";
+                  }}
+                />
+                <div className="food-content">
+                  <div className="food-header">
+                    <div className="food-info">
+                      <h3 className="food-title">{food.name}</h3>
+                      <p className="food-donor">by {food.donor}</p>
+                    </div>
                   </div>
                   
-                  {/* Availability Badge */}
-                  <div className="absolute top-1 right-1">
-                    <span className="bg-green-500 text-white text-xs px-1 py-0.5 rounded font-medium">
-                      •
-                    </span>
+                  <div className="food-meta">
+                    <div className="meta-item">
+                      <Clock className="meta-icon" />
+                      <span>{food.availabilityDate}</span>
+                    </div>
+                    <div className="meta-item">
+                      <MapPin className="meta-icon" />
+                      <span>{food.location}</span>
+                    </div>
                   </div>
-                </div>
-
-                {/* Card Content */}
-                <div className="p-2">
-                  {/* Food Name */}
-                  <h3 className="font-medium text-gray-900 text-xs mb-1 truncate">
-                    {food.name}
-                  </h3>
                   
-                  {/* Donor */}
-                  <p className="text-xs text-gray-600 truncate mb-1">
-                    {food.donor}
-                  </p>
-
-                  {/* Timing */}
-                  <div className="flex items-center gap-1 text-xs text-gray-500">
-                    <Clock className="w-2.5 h-2.5 flex-shrink-0" />
-                    <span className="truncate text-xs">{food.availabilityDate}</span>
+                  <div className="food-actions-bottom">
+                    <span className="food-quantity">{food.quantity || 'Available'}</span>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        // Add request functionality
+                      }}
+                      className="request-button"
+                    >
+                      Request
+                    </button>
                   </div>
                 </div>
               </div>
