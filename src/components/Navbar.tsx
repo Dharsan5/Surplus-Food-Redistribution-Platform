@@ -1,13 +1,10 @@
-import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { MapPin, Search, ShoppingBag, User, Home } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
-import { useAuth } from '@/contexts/AuthContext';
 
 export default function Navbar() {
   const location = useLocation();
   const { state } = useCart();
-  const { user } = useAuth();
 
   return (
     <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">

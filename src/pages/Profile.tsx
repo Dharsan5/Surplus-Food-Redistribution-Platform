@@ -1,4 +1,3 @@
-import React from 'react';
 import { User, MapPin, CreditCard, Bell, HelpCircle, Star, Gift, Settings, ChevronRight, LogOut } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 

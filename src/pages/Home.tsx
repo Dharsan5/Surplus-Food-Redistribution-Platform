@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, Star, Clock, Truck, Search } from 'lucide-react';
 import { mockRestaurants } from '@/data/mockData';

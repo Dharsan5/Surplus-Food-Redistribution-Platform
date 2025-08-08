@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Clock, MapPin, Star, Plus, Minus, ShoppingCart, Trash2 } from 'lucide-react';
+import { useState } from 'react';
+import { Clock, MapPin, Plus, Minus, ShoppingCart, Trash2 } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { mockOrders } from '@/data/mockData';
 
