@@ -1,0 +1,62 @@
+/* BottomNavigation.css */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: white;
+  border-top: 1px solid #e5e7eb;
+  padding: 0.5rem;
+  z-index: 100;
+}
+
+.nav-container {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  max-width: 28rem;
+  margin: 0 auto;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  text-decoration: none;
+  color: #9ca3af;
+}
+
+.nav-item:hover {
+  color: #6b7280;
+  background-color: #f9fafb;
+}
+
+.nav-item.active {
+  background-color: #dcfce7;
+  color: #22c55e;
+}
+
+.nav-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.nav-label {
+  font-size: 0.75rem;
+  margin-top: 0.125rem;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+
+.nav-label.active {
+  color: #22c55e;
+}
+
+.nav-label:not(.active) {
+  color: #9ca3af;
+}
